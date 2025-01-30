@@ -11,10 +11,9 @@ import {
   Box,
   Container,
 } from "@mui/material";
-import StarIcon from "@mui/icons-material/Star";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Star as StarIcon, ChevronRight as ChevronRightIcon } from "@mui/icons-material";
 
-const courseData = [
+const COURSE_DATA = [
   {
     level: "Basic",
     duration: "3 Months",
@@ -47,220 +46,152 @@ const courseData = [
   },
 ];
 
-const CardAnimation = ({ children }) => {
-  const cardRef = useRef();
-
-  useEffect(() => {
-    const card = cardRef.current;
-    
-    const handleMove = (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rotateX = (y - centerY) / 20;
-      const rotateY = (centerX - x) / 20;
-
-      gsap.to(card, {
-        rotateX: rotateX,
-        rotateY: rotateY,
-        duration: 0.5,
-        ease: "power2.out"
-      });
-    };
-
-    card.addEventListener('mousemove', handleMove);
-    card.addEventListener('mouseleave', () => {
-      gsap.to(card, {
-        rotateX: 0,
-        rotateY: 0,
-        duration: 0.5,
-        ease: "power2.out"
-      });
-    });
-
-    return () => {
-      card.removeEventListener('mousemove', handleMove);
-      card.removeEventListener('mouseleave', handleMove);
-    };
-  }, []);
-
-  return <div ref={cardRef}>{children}</div>;
+const styles = {
+  section: {
+    minHeight: "100vh",
+    py: 10,
+    backgroundColor: "transparent",
+    display: "flex",
+    alignItems: "center",
+  },
+  title: {
+    textAlign: "center",
+    mb: 8,
+    fontWeight: "bold",
+    color: "#8B5E34",
+    textShadow: "2px 2px 4px rgba(139, 94, 52, 0.2)",
+  },
+  cardWrapper: {
+    height: "100%",
+    transform: "translateY(0)",
+    transition: "all 0.4s ease",
+    "&:hover": {
+      transform: "translateY(-15px)",
+    },
+  },
+  card: {
+    height: "100%",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "20px",
+    border: "1px solid rgba(139, 94, 52, 0.1)",
+    boxShadow: "0 10px 30px rgba(139, 94, 52, 0.1)",
+    transition: "all 0.4s ease",
+    "&:hover": {
+      boxShadow: "0 20px 40px rgba(139, 94, 52, 0.15)",
+    },
+  },
+  cardHeader: {
+    backgroundColor: "#8B5E34",
+    color: "#fff",
+    p: 3,
+    textAlign: "center",
+  },
+  topicsList: {
+    listStyle: "none",
+    pl: 0,
+    mb: 4,
+    "& li": {
+      display: "flex",
+      alignItems: "center",
+      color: "rgba(139, 94, 52, 0.8)",
+      mb: 2,
+      fontSize: "1.1rem",
+    },
+  },
+  learnMoreButton: {
+    borderColor: "#8B5E34",
+    color: "#8B5E34",
+    py: 1.5,
+    fontSize: "1.1rem",
+    fontWeight: "bold",
+    "&:hover": {
+      backgroundColor: "#8B5E34",
+      borderColor: "#8B5E34",
+      color: "white",
+    },
+  }
 };
+
+const CourseCard = ({ course, cardRef }) => (
+  <Box ref={cardRef} sx={styles.cardWrapper}>
+    <Card sx={styles.card}>
+      <CardHeader
+        sx={styles.cardHeader}
+        title={
+          <Typography variant="h5" fontWeight="bold" mb={1}>
+            {course.level} Level
+          </Typography>
+        }
+        subheader={
+          <Typography variant="h6" sx={{ color: "rgba(255, 255, 255, 0.9)" }}>
+            {course.duration}
+          </Typography>
+        }
+      />
+      <CardContent sx={{ p: 4 }}>
+        <Box component="ul" sx={styles.topicsList}>
+          {course.topics.map((topic, i) => (
+            <li key={i}>
+              <StarIcon sx={{ color: "#8B5E34", fontSize: 24, mr: 2, opacity: 0.8 }} />
+              {topic}
+            </li>
+          ))}
+        </Box>
+        <CardActions sx={{ padding: 0 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            sx={styles.learnMoreButton}
+            endIcon={<ChevronRightIcon />}
+          >
+            Learn More
+          </Button>
+        </CardActions>
+      </CardContent>
+    </Card>
+  </Box>
+);
 
 const CoursesSection = () => {
   const sectionRef = useRef(null);
   const cardRefs = useRef([]);
 
   useEffect(() => {
-    gsap.fromTo(
-      sectionRef.current.querySelector(".section-title"),
-      {
-        opacity: 0,
-        y: -50
+    const animations = {
+      title: {
+        from: { opacity: 0, y: -50 },
+        to: { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }
       },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power3.out"
+      cards: {
+        from: { opacity: 0, y: 100 },
+        to: { opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: 0.3 }
       }
-    );
+    };
 
     gsap.fromTo(
-      cardRefs.current,
-      {
-        opacity: 0,
-        y: 100,
-        rotateX: 45
-      },
-      {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 1,
-        ease: "power3.out",
-        stagger: 0.3
-      }
+      sectionRef.current.querySelector(".section-title"),
+      animations.title.from,
+      animations.title.to
     );
+
+    gsap.fromTo(cardRefs.current, animations.cards.from, animations.cards.to);
   }, []);
 
   return (
-    <Box
-      id="courses"
-      ref={sectionRef}
-      sx={{
-        minHeight: "100vh",
-        py: 10,
-        backgroundColor: "transparent",
-        display: "flex",
-        alignItems: "center",
-        position: "relative",
-      }}
-    >
+    <Box id="courses" ref={sectionRef} sx={styles.section}>
       <Container maxWidth="lg">
-        <Typography
-          className="section-title"
-          variant="h3"
-          sx={{
-            textAlign: "center",
-            mb: 8,
-            fontWeight: "bold",
-            color: "#8B5E34",
-            textShadow: "2px 2px 4px rgba(139, 94, 52, 0.2)",
-          }}
-        >
+        <Typography className="section-title" variant="h3" sx={styles.title}>
           Our Courses
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
-          {courseData.map((course, index) => (
+          {COURSE_DATA.map((course, index) => (
             <Grid item xs={12} md={4} key={index}>
-              <Box
-                ref={(el) => (cardRefs.current[index] = el)}
-                sx={{
-                  height: "100%",
-                  transform: "translateY(0)",
-                  transition: "all 0.4s ease",
-                  "&:hover": {
-                    transform: "translateY(-15px)",
-                  },
-                }}
-              >
-                <Card
-                  sx={{
-                    height: "100%",
-                    backgroundColor: "rgba(255, 255, 255, 0.95)",
-                    backdropFilter: "blur(10px)",
-                    borderRadius: "20px",
-                    border: "1px solid rgba(139, 94, 52, 0.1)",
-                    overflow: "hidden",
-                    boxShadow: "0 10px 30px rgba(139, 94, 52, 0.1)",
-                    transition: "all 0.4s ease",
-                    "&:hover": {
-                      boxShadow: "0 20px 40px rgba(139, 94, 52, 0.15)",
-                    },
-                  }}
-                >
-                  <CardHeader
-                    sx={{
-                      backgroundColor: "#8B5E34",
-                      color: "#fff",
-                      p: 3,
-                      textAlign: "center",
-                    }}
-                    title={
-                      <Typography variant="h5" fontWeight="bold" mb={1}>
-                        {course.level} Level
-                      </Typography>
-                    }
-                    subheader={
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "rgba(255, 255, 255, 0.9)" }}
-                      >
-                        {course.duration}
-                      </Typography>
-                    }
-                  />
-                  <CardContent sx={{ p: 4 }}>
-                    <Box
-                      component="ul"
-                      sx={{
-                        listStyle: "none",
-                        pl: 0,
-                        mb: 4,
-                        "& li": {
-                          display: "flex",
-                          alignItems: "center",
-                          color: "rgba(139, 94, 52, 0.8)",
-                          mb: 2,
-                          fontSize: "1.1rem",
-                        },
-                      }}
-                    >
-                      {course.topics.map((topic, i) => (
-                        <li key={i}>
-                          <StarIcon
-                            sx={{
-                              color: "#8B5E34",
-                              fontSize: 24,
-                              mr: 2,
-                              opacity: 0.8
-                            }}
-                          />
-                          {topic}
-                        </li>
-                      ))}
-                    </Box>
-                    <CardActions sx={{ padding: 0 }}>
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        sx={{
-                          borderColor: "#8B5E34",
-                          color: "#8B5E34",
-                          py: 1.5,
-                          fontSize: "1.1rem",
-                          fontWeight: "bold",
-                          "&:hover": {
-                            backgroundColor: "#8B5E34",
-                            borderColor: "#8B5E34",
-                            color: "white",
-                          },
-                          transition: "all 0.3s ease",
-                        }}
-                        endIcon={<ChevronRightIcon />}
-                      >
-                        Learn More
-                      </Button>
-                    </CardActions>
-                  </CardContent>
-                </Card>
-              </Box>
+              <CourseCard
+                course={course}
+                cardRef={(el) => (cardRefs.current[index] = el)}
+              />
             </Grid>
           ))}
         </Grid>
