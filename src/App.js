@@ -4,7 +4,7 @@ import NavBar from "./components/NavBar";
 import DecorativeElements from "./components/DecorativeElements";
 import HeroSection from "./components/HeroSection";
 import DesignSection from "./components/DesignSection";
-import JourneySection from "./components/JourneySection";
+// import JourneySection from "./components/JourneySection";
 // import DesignShowcase from "./components/DesignShowcase";
 import ContactSection from './components/ContactSection';
 import GallerySection from './components/GallerySection';
@@ -81,9 +81,9 @@ function App() {
           <DesignSection />
         </section>
 
-        <section id="journey">
-          <JourneySection />
-        </section>
+        //<section id="journey">
+          //<JourneySection />
+       // </section>
 
 {/* 
         <section id="design-showcase">
