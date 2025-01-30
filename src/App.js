@@ -81,9 +81,9 @@ function App() {
           <DesignSection />
         </section>
 
-        //<section id="journey">
-          //<JourneySection />
-       // </section>
+{/*         <section id="journey">
+          <JourneySection />
+        </section> */}
 
 {/* 
         <section id="design-showcase">
